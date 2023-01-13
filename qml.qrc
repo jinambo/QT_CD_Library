@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>LibraryView.qml</file>
+        <file>assets/delete.svg</file>
+        <file>SearchBar.qml</file>
+        <file>CreatePopup.qml</file>
+        <file>Input.qml</file>
+        <file>assets/add.svg</file>
+        <file>assets/down.svg</file>
+        <file>assets/booklets/snake_monastery.png</file>
+        <file>assets/booklets/second_nature.png</file>
+        <file>CustomDialog.qml</file>
+    </qresource>
+</RCC>
