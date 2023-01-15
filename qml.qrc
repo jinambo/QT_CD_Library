@@ -11,5 +11,10 @@
         <file>assets/booklets/snake_monastery.png</file>
         <file>assets/booklets/second_nature.png</file>
         <file>CustomDialog.qml</file>
+        <file>assets/edit.svg</file>
+        <file>ColumnTitle.qml</file>
+        <file>ColumnItem.qml</file>
+        <file>SimpleSearch.qml</file>
+        <file>ExtendedSearch.qml</file>
     </qresource>
 </RCC>

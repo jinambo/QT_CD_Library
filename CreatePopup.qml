@@ -5,6 +5,82 @@ import QtQuick.Dialogs
 import AlbumLib 1.0
 
 Popup {
+    property bool isNew: true
+    property var albumData
+    readonly property var textFieldsList: [titleIn, authorIn, genreIn, dateIn, imgUrlIn]
+    // TODO: namapovat properties pro edit alba
+    // property string title: ""
+    // property string author: ""
+
+    // Fill Text Fields with data from the clicked item
+    function edit(data) {
+        isNew = false;
+
+        albumData = data
+
+        titleIn.textItem.text = data.title;
+        authorIn.textItem.text = data.author;
+        dateIn.textItem.text = data.date;
+        genreIn.textItem.text = data.genre;
+        imgUrlIn.textItem.text = data.imgUrl;
+        album.setTracks(data.tracks);
+
+        open();
+    }
+
+    function create() {
+        isNew = true;
+
+        // Clear text fields
+        textFieldsList.forEach(item => item.textItem.text = "");
+        album.setTracks([]);
+
+        open();
+    }
+
+    function submitCreate() {
+        // TODO: mozny memory leak -> proverit
+        /*
+        album.initAlbum(
+            titleIn.textItem.text,
+            authorIn.textItem.text,
+            dateIn.textItem.text,
+            genreIn.textItem.text
+        )*/
+
+        library.addAlbum(
+            imgUrlIn.textItem.text,
+            titleIn.textItem.text,
+            authorIn.textItem.text,
+            dateIn.textItem.text,
+            genreIn.textItem.text,
+            album.tracks
+        );
+
+        textFieldsList.forEach(item => item.textItem.text = "");
+
+        createPopup.close();
+    }
+
+    function submitEdit() {
+        // TODO: edit album
+        console.log("Edit album fired");
+
+        library.editAlbum(
+            library.albums.indexOf(albumData),
+            imgUrlIn.textItem.text,
+            titleIn.textItem.text,
+            authorIn.textItem.text,
+            dateIn.textItem.text,
+            genreIn.textItem.text,
+            album.tracks
+        );
+
+        textFieldsList.forEach(item => item.textItem.text = "");
+
+        createPopup.close();
+    }
+
     width: parent.width
     height: parent.height
 
@@ -14,6 +90,10 @@ Popup {
 
     Album {
         id: album
+
+        Component.onCompleted: {
+            console.log('Component completed' + album.title)
+        }
     }
 
     Rectangle {
@@ -46,7 +126,7 @@ Popup {
                 //Layout.alignment: Qt.AlignTop
 
                 Text {
-                    text: "Create a new album"
+                    text: isNew ? "Create a new album" : "Edit album"
                     font.pixelSize: 32
                     color: "#90F2F2"
                 }
@@ -75,19 +155,20 @@ Popup {
                             Input { id: genreIn; title: "Genre" }
                             Input { id: dateIn; title: "Date (year)" }
                             RowLayout {
-                                Input { id: imgUrlIn; title: "Picture"; fullWidth: false; Layout.alignment: Qt.AlignBottom; }
+                                Input { id: imgUrlIn; title: "Picture"; fullWidth: false; canEdit: false; Layout.alignment: Qt.AlignBottom; }
                                 Button {
                                     implicitWidth: infoCol.width * 0.3
                                     Layout.alignment: Qt.AlignBottom
 
                                     CustomDialog {
                                         id: saveFileDialog
-                                        title: qsTr("Save to ...")
+                                        title: qsTr("Choose album's picture ...")
                                         onRejected: {
                                             console.log("Canceled")
                                         }
                                         onAccepted: {
-                                            console.log("File selected: ")
+                                            const fullPath = String(file).replace("file://", "")
+                                            imgUrlIn.textItem.text = fullPath
                                         }
                                     }
 
@@ -238,33 +319,11 @@ Popup {
                     }
 
                     Button {
-                        readonly property var textFieldsList: [titleIn, authorIn, genreIn, dateIn]
-                        text: "Create"
+                        text: isNew ? "Create" : "Edit"
                         font.pixelSize: 20
                         width: 200
                         height: 48
-                        onClicked: {
-                            // TODO: mozny memory leak -> proverit
-                            /*
-                            album.initAlbum(
-                                titleIn.textItem.text,
-                                authorIn.textItem.text,
-                                dateIn.textItem.text,
-                                genreIn.textItem.text
-                            )*/
-
-                            library.addAlbum(
-                                "assets/booklets/second_nature.png",
-                                titleIn.textItem.text,
-                                authorIn.textItem.text,
-                                dateIn.textItem.text,
-                                genreIn.textItem.text,
-                                album.tracks
-                            )
-
-                            textFieldsList.forEach(item => item.textItem.text = "")
-                            createPopup.close()
-                        }
+                        onClicked: isNew ? submitCreate() : submitEdit()
                         background: Rectangle {
                             color: parent.down ? "#6ED1D1" :
                                     (parent.hovered ? "#6ED1D1" : "#90F2F2")

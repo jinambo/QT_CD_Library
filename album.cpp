@@ -1,11 +1,17 @@
 #include "album.h"
 #include <QDebug>
+#include <QFile>
+#include <QDir>
 
 // Constructor
 Album::Album(QObject *parent)
     : QObject{parent}, m_imgUrl{""}, m_title{""}, m_author{""}, m_date{0}, m_genre{""} {
 
     qDebug() <<  "Album initialized";
+}
+
+Album::~Album() {
+    qDebug() <<  "Album instance deleted.";
 }
 
 // Methods
@@ -105,8 +111,19 @@ void Album::setGenre(const QString &newGenre) {
 }
 
 void Album::setTracks(const QVector<QString> &newTracks) {
-    if (m_tracks.length() == 0) {
-        m_tracks = newTracks;
-        emit tracksChanged(newTracks);
+    int sameValuesCount = 0;
+
+    QString str;
+    foreach (str, m_tracks) {
+        if (newTracks.contains(str)) sameValuesCount++;
     }
+
+    // Check if values are same as before
+    if (newTracks.length() == m_tracks.length() &&
+           sameValuesCount == m_tracks.length()) {
+        return;
+    }
+
+    m_tracks = newTracks;
+    emit tracksChanged(newTracks);
 }

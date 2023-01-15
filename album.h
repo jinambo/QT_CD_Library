@@ -15,6 +15,7 @@ class Album : public QObject {
 
 public:
     explicit Album(QObject *parent = nullptr);
+    ~Album();
     const uint64_t &id() const;
     const QString &imgUrl() const;
     const QString &title() const;

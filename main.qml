@@ -11,7 +11,7 @@ Window {
     height: 832
     visible: true
     color: "#34495E"
-    title: qsTr("Hello World")
+    title: qsTr("CD Library")
 
     Library {
         id: library
@@ -19,21 +19,11 @@ Window {
 
     SearchBar { }
 
-    Button {
-        id: myBtn
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        text: "Quick test"
-        onClicked: {
-            const tracks = ["Test 1", "Test 2"]
-            library.addAlbum("assets/booklets/snake_monastery.png", "Hangjaw", "Hydra", "2022", "Neurofunk DNB", tracks)
-        }
-    }
 
     Rectangle {
         id: dataWrapper
-        implicitWidth: myWindow.width - 80
-        implicitHeight: parent.height - 250
+        width: myWindow.width - 80
+        height: parent.height - 250
         //anchors.horizontalCenter: parent.horizontalCenter
         anchors.left: parent.left
         anchors.right: parent.right
@@ -45,11 +35,9 @@ Window {
 
         ColumnLayout {
             anchors.fill: parent
-            implicitWidth: dataWrapper.width
-            implicitHeight: dataWrapper.height
 
             Text {
-                text: "Your favorite music"
+                text: library.filter ? `Results for: ${library.filter}` : "Search your favorite music"
                 color: "#90F2F2"
                 font.pixelSize: 32
                 bottomPadding: 40
@@ -62,81 +50,31 @@ Window {
 
                 Rectangle { width: 5; height: 20; color: "transparent" }
 
-                Rectangle {
-                    width: dataWrapper.width * 0.1
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: "Picture"
-                        font.pixelSize: 18
-                        color: "#90F2F2"
-                    }
-                }
+                ColumnTitle { colWidth: 1; title: "Picture" }
+                ColumnTitle { colWidth: 2; title: "Title" }
+                ColumnTitle { colWidth: 2; title: "Author" }
+                ColumnTitle { colWidth: 1; title: "Year" }
+                ColumnTitle { colWidth: 2; title: "Genre" }
 
                 Rectangle {
-                    width: dataWrapper.width * 0.25
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: "Title"
-                        font.pixelSize: 18
-                        color: "#90F2F2"
-                    }
-                }
-
-                Rectangle {
-                    width: dataWrapper.width * 0.2
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: "Author"
-                        font.pixelSize: 18
-                        color: "#90F2F2"
-                    }
-                }
-
-                Rectangle {
-                    width: dataWrapper.width * 0.1
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: "Date"
-                        font.pixelSize: 18
-                        color: "#90F2F2"
-                    }
-                }
-
-                Rectangle {
-                    width: dataWrapper.width * 0.25
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: "Genre"
-                        font.pixelSize: 18
-                        color: "#90F2F2"
-                    }
-                }
-
-                Rectangle {
-                    width: dataWrapper.width * 0.1
-                    height: 85
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
+                    height: 20
                     color: "transparent"
                 }
             }
 
             Rectangle {
-                width: dataWrapper.implicitWidth
+                width: dataWrapper.width
                 Layout.fillHeight: true
-                anchors.top: dataTitles.top
-                anchors.topMargin: 30
+                //anchors.top: dataTitles.top
+                //anchors.topMargin: 30
                 color: "transparent"
 
-                LibraryView {}
+                LibraryView {
+                    width: dataWrapper.width
+                    height: parent.height
+                }
             }
         }
     }
@@ -144,7 +82,6 @@ Window {
     CreatePopup {
         id: createPopup
     }
-
 
     Image {
         width: 30
@@ -159,7 +96,7 @@ Window {
         MouseArea {
             width: parent.width
             height: parent.height
-            onClicked: createPopup.open()
+            onClicked: createPopup.create()
             cursorShape: Qt.PointingHandCursor
         }
     }

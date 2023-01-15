@@ -15,37 +15,46 @@ Rectangle {
     anchors.topMargin: 60
     color: "transparent"
 
-    RowLayout {
-        TextField {
-            id: searchIn
-            implicitWidth: searchRect.width * 0.75
-            implicitHeight: searchRect.height
-            placeholderText: "Type keywords to search ..."
-            placeholderTextColor: "#C3D3D4"
-            color: "#fff"
-            font.pixelSize: 20
-            verticalAlignment: TextInput.AlignVCenter
-            background: Rectangle {
-                color: "transparent"
-                border.color: "#95A5A6"
-                border.width: 2
-                radius: 8
-            }
+    ColumnLayout {
+        width: parent.width
+
+        Loader {
+            id: searchLoader
+            source: control.checked ? "ExtendedSearch.qml" : "SimpleSearch.qml"
         }
 
-        Button {
-            id: searchBtn
-            implicitWidth: searchRect.width * 0.25
-            implicitHeight: searchRect.height
-            text: "Search"
-            font.pixelSize: 20
+        CheckBox {
+            id: control
+            checked: false
 
-            background: Rectangle {
-                    color: parent.down ? "#6ED1D1" :
-                            (parent.hovered ? "#6ED1D1" : "#90F2F2")
-                    radius: 8
+            indicator: Rectangle {
+                implicitWidth: 18
+                implicitHeight: 18
+                anchors.verticalCenter: parent.verticalCenter
+                radius: 2
+                border.width: 2
+                border.color: "#90F2F2"
+                color: "transparent"
+
+                Rectangle {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: 6
+                    height: 6
+                    radius: 1
+                    color: "#90F2F2"
+                    visible: control.checked
+                }
             }
-            // onClicked: vyhledej
+
+            contentItem: Text {
+                text: control.checked ? "Disable extended filter" : "Enable extended filter"
+                color: "#90F2F2"
+                font.pixelSize: 16
+                font.weight: 500
+                verticalAlignment: Text.AlignVCenter
+                leftPadding: control.indicator.width
+            }
         }
     }
 }

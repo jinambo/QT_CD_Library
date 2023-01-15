@@ -3,104 +3,77 @@ import QtQuick.Controls 2.0
 import QtQuick.Layouts 1.3
 
 ListView {
+    property string filter: library.filter
+    property var filteredAlbums
+
+    function filterAlbums(term) {
+        const albums = library.albums;
+
+        // If extended search is enabled
+        if (term.includes("?")) {
+            const re = /(\w+):\s*(?:"([^"]*)"|(\S+))/g;
+            let dict = {}, m;
+
+            while (m = re.exec(term)) {
+              dict[m[1]]=(m[3] || m[2]);
+            }
+
+            return albums.filter(dict.author ? a => a.author.toLowerCase().includes(dict.author.toLowerCase()) : a => a)
+                .filter(dict.genre ? a => a.genre.toLowerCase().includes(dict.genre.toLowerCase()): a => a)
+                .filter(dict.year ? a => String(a.date) === String(dict.year) : a => a);
+
+        } else {
+            return albums.filter(a => a.title.toLowerCase().includes(term.toLowerCase()));
+        }
+    }
+
+    onFilterChanged: {
+        filteredAlbums = filterAlbums(filter);
+    }
+
     id: theView
-    implicitWidth: parent.width
-    implicitHeight: parent.height
     clip: true
-    model: library.albums
+    model: filter ? filteredAlbums : library.albums
     spacing: 10
 
     delegate: Rectangle {
-        width: parent.width
-        height: childrenRect.height
+        id: dataWrapper
+        implicitWidth: theView.width
+        implicitHeight: childrenRect.height
         color: "#253546"
         radius: 8
+        clip: true
 
         ColumnLayout {
+            width: theView.width
 
             RowLayout {
-                width: parent.width
+                width: parent.implicitWidth
                 Rectangle { width: 5; height: 20; color: "transparent" }
 
                 Rectangle {
-                    width: theView.width * 0.1
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
                     height: 85
                     color: "transparent"
 
                     Image {
                         width: 65
                         height: 65
-                        source: modelData.imgUrl
+                        source: "file:///" + modelData.imgUrl
                         fillMode: Image.PreserveAspectFit
                         anchors.verticalCenter: parent.verticalCenter
-
                     }
                 }
 
-                Rectangle {
-                    id: rectLayout
-                    width: theView.width * 0.25
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: modelData.title
-                        font.pixelSize: 18
-                        color: "#fff"
-                        width: theView.width * 0.25
-                        wrapMode: Text.Wrap
-                        anchors.verticalCenter: parent.verticalCenter
-                        // leftPadding: 20
-                    }
-                }
+                ColumnItem { colWidth: 2; title: modelData.title }
+                ColumnItem { colWidth: 2; title: modelData.author }
+                ColumnItem { colWidth: 1; title: modelData.date }
+                ColumnItem { colWidth: 2; title: modelData.genre }
 
                 Rectangle {
-                    width: theView.width * 0.2
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: modelData.author
-                        font.pixelSize: 18
-                        color: "#fff"
-                        width: theView.width * 0.2
-                        wrapMode: Text.Wrap
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Rectangle {
-                    width: theView.width * 0.1
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: modelData.date
-                        font.pixelSize: 18
-                        color: "#fff"
-                        width: theView.width * 0.1
-                        wrapMode: Text.Wrap
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Rectangle {
-                    width: theView.width * 0.25
-                    height: 85
-                    color: "transparent"
-
-                    Text {
-                        text: modelData.genre
-                        font.pixelSize: 18
-                        color: "#fff"
-                        width: theView.width * 0.25
-                        wrapMode: Text.Wrap
-                        anchors.verticalCenter: parent.verticalCenter
-                    }
-                }
-
-                Rectangle {
-                    width: theView.width * 0.1
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: 1
                     height: 85
                     color: "transparent"
 
@@ -108,24 +81,7 @@ ListView {
                         width: parent.width
                         height: 85
                         spacing: 8
-
-                        // Item detail (dropdown)
-                        Image {
-                            //horizontalAlignment: Image.AlignRight
-                            width: 30
-                            height: 30
-                            source: "assets/down.svg"
-                            fillMode: Image.PreserveAspectFit
-                            anchors.verticalCenter: parent.verticalCenter
-                            Layout.fillWidth: true
-
-                            MouseArea {
-                                width: parent.width
-                                height: parent.height
-                                onClicked: albumDetail.visible = !albumDetail.visible
-                                cursorShape: Qt.PointingHandCursor
-                            }
-                        }
+                        layoutDirection: Qt.RightToLeft
 
                         // Remove item
                         Image {
@@ -143,23 +99,62 @@ ListView {
                                 cursorShape: Qt.PointingHandCursor
                             }
                         }
+
+                        // Edit item
+                        Image {
+                            //horizontalAlignment: Image.AlignRight
+                            width: 30
+                            height: 30
+                            source: "assets/edit.svg"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+
+                            MouseArea {
+                                width: parent.width
+                                height: parent.height
+                                // onClicked: library.removeAlbum(library.albums.indexOf(modelData))
+                                onClicked: createPopup.edit(modelData)
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
+
+                        // Item detail (dropdown)
+                        Image {
+                            //horizontalAlignment: Image.AlignRight
+                            width: 30
+                            height: 30
+                            source: "assets/down.svg"
+                            fillMode: Image.PreserveAspectFit
+                            anchors.verticalCenter: parent.verticalCenter
+                            //Layout.fillWidth: true
+                            visible: modelData.tracks.length > 0
+
+                            MouseArea {
+                                width: parent.width
+                                height: parent.height
+                                onClicked: albumDetail.visible = !albumDetail.visible
+                                cursorShape: Qt.PointingHandCursor
+                            }
+                        }
                     }
 
                 }
+
+                Rectangle { width: 5; height: 20; color: "transparent" }
             }
 
             Rectangle {
                 id: albumDetail
                 width: theView.width
-                height: childrenRect.height + 20
+                implicitHeight: childrenRect.height + 10
                 color: "#293D52"
                 visible: false
-                // radius: 8
+                //radius: 8
 
                 ListView {
                     interactive: false
                     implicitWidth: parent.width
-                    implicitHeight: childrenRect.height + 20
+                    implicitHeight: childrenRect.height + 10
                     clip: true
                     model: modelData.tracks
 
@@ -168,7 +163,7 @@ ListView {
 
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        height: trackText.contentHeight
+                        height: trackText.height
                         color: "transparent"
 
                         Text {
@@ -177,8 +172,10 @@ ListView {
                             wrapMode: Text.WordWrap
                             font.pixelSize: 18
                             color: "#90F2F2"
-                            padding: 20
-                            lineHeight: 1.33
+                            leftPadding: 20
+                            rightPadding: 20
+                            topPadding: 10
+                            //lineHeight: 1.33
                         }
                     }
                 }

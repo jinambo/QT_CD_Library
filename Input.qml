@@ -6,6 +6,7 @@ import QtQuick.Layouts 1.15
 Column {
     property alias textItem: inputId
     property string title: ""
+    property bool canEdit: true
     property bool fullWidth: true
 
     Label {
@@ -16,11 +17,13 @@ Column {
 
     TextField {
         id: inputId
-        implicitWidth: parent.fullWidth ? infoCol.width - 20 : infoCol.width * 0.7
+        enabled: parent.canEdit
+        implicitWidth: parent.fullWidth ? infoCol.width - 20 : infoCol.width * 0.7 - 20
         topPadding: 10
         bottomPadding: 10
         color: "#fff"
         font.pixelSize: 16
+        opacity: parent.canEdit ? 0.75 : 0.1
         background: Rectangle {
             color: "transparent"
             border.color: "#95A5A6"

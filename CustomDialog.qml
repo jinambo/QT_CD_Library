@@ -5,7 +5,7 @@ import QtQuick.Dialogs
 Item {
     id: root
     property alias title: qmlFileDialog.title
-    //property alias fileUrl: qmlFileDialog.fileUrl
+    property alias file: qmlFileDialog.selectedFile
     //property alias fileUrls: qmlFileDialog.fileUrls
 
     signal accepted()
