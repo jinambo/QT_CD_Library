@@ -128,6 +128,7 @@ ListView {
                             anchors.verticalCenter: parent.verticalCenter
                             //Layout.fillWidth: true
                             visible: modelData.tracks.length > 0
+                            rotation: albumDetail.visible ? 180 : 0
 
                             MouseArea {
                                 width: parent.width

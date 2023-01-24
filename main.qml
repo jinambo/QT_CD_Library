@@ -62,6 +62,8 @@ Window {
                     height: 20
                     color: "transparent"
                 }
+
+                Rectangle { width: 5; height: 20; color: "transparent" }
             }
 
             Rectangle {

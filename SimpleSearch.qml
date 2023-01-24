@@ -7,7 +7,7 @@ RowLayout {
         id: searchIn
         implicitWidth: searchRect.width * 0.75
         implicitHeight: searchRect.height
-        placeholderText: "Type keywords to search ..."
+        placeholderText: "Type album title to search ..."
         placeholderTextColor: "#C3D3D4"
         color: "#fff"
         font.pixelSize: 20
